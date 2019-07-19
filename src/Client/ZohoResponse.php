@@ -52,11 +52,21 @@ class ZohoResponse
 	 */
 	protected function parseResponse($action): ZohoResponse
 	{
+		if(($this->http_status_code == 204) && ($this->response->getReasonPhrase() == "No Content") && $action == "search") {
+			$array = array(
+				'data' => array()
+			);
+			array_push($array['data'], ['error_code' => $this->http_status_code, 'error_message' => $this->response->getReasonPhrase()]);
+
+			$this->setResults(json_encode($array));
+			$array_response = $this->toArray(json_encode($array));
+			$this->setStatus('error_no_content');
+			return $this;
+		}
 		
 		$json_response = $this->response->getBody()->getContents();
 		$invoke_function = camel_case(str_replace(' ', '', $action));
 		return $this->$invoke_function($json_response);
-
 	}
 
 	private function setSuccessResponse($json_response)
