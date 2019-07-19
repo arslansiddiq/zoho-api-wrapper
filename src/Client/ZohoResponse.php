@@ -52,6 +52,7 @@ class ZohoResponse
 	 */
 	protected function parseResponse($action): ZohoResponse
 	{
+		// If No content in response, return with error_code 204
 		if(($this->http_status_code == 204) && ($this->response->getReasonPhrase() == "No Content") && $action == "search") {
 			$array = array(
 				'data' => array()
